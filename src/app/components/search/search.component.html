@@ -1,0 +1,20 @@
+<div id="ai_search">
+  <h1 id="title">Alva Search</h1>
+
+  <div id="search">
+    <label id="question_label">Question</label>
+    <input id="question_input" [formControl]="query" type="text" (keyup.enter)="sendQuery()" placeholder="Ask a question...">
+  </div>
+
+  <button (click)="sendQuery()" id="search_button">Search</button>
+
+  <div id="messages">
+    @for(msg of messages; track msg.sender) {
+      <p id="message">
+        <span id="sender">{{msg.sender}}</span>: {{msg.content}}
+      </p>
+      <!-- {{ msg.content }} -->
+    }
+  </div>
+</div>
+
