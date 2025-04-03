@@ -1,3 +1,42 @@
 :root {
   color-scheme: light dark;
+  /* Light theme (default) */
+  --background-color: #ffffff;
+  --text-color: #333333;
+  --primary-color: #007bff;
+  --secondary-color: #6c757d;
+  --border-color: #dee2e6;
+  --input-background: #f8f9fa;
+  --hover-color: #0056b3;
+}
+
+/* Dark theme */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background-color: #1a1a1a;
+    --text-color: #ffffff;
+    --primary-color: #0d6efd;
+    --secondary-color: #adb5bd;
+    --border-color: #495057;
+    --input-background: #2d2d2d;
+    --hover-color: #0a58ca;
+  }
+}
+
+/* Apply theme variables */
+body {
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+input,
+button {
+  background-color: var(--input-background);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+}
+
+button:hover {
+  background-color: var(--hover-color);
+  color: white;
 }

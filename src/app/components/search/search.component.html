@@ -1,20 +1,38 @@
 <div id="ai_search">
   <h1 id="title">Alva Search</h1>
 
-  <div id="search">
-    <label id="question_label">Question</label>
-    <input id="question_input" [formControl]="query" type="text" (keyup.enter)="sendQuery()" placeholder="Ask a question...">
+  <!-- Input and Icon container -->
+  <div class="search-container">
+    <input id="question_input" class="search-input" [formControl]="query" type="text" (keyup.enter)="sendQuery()"
+      placeholder="Ask anything..." />
+    <!-- Icon Button -->
+    <button class="search-icon-button" (click)="sendQuery()" title="Search" aria-label="Search"
+      [disabled]="!isConnected || isGenerating">
+      <i class="fas fa-search"></i>
+    </button>
   </div>
 
-  <button (click)="sendQuery()" id="search_button">Search</button>
+  <p *ngIf="!isConnected" class="status-text connecting">Connecting...</p>
+  <!-- <p *ngIf="isGenerating && hasNoAiBotMessage()" class="status-text generating">Generating response...</p> -->
 
-  <div id="messages">
-    @for(msg of messages; track msg.sender) {
-      <p id="message">
-        <span id="sender">{{msg.sender}}</span>: {{msg.content}}
-      </p>
-      <!-- {{ msg.content }} -->
+
+  <div id="results-area" *ngIf="messages.length > 0">
+    @for(msg of messages; track msg.timestamp) {
+      @if (msg.sender === 'user') {
+        <div class="user-query">
+          <!-- <h2>Your Query:</h2> -->
+          <h2>{{ msg.content }}</h2>
+        </div>
+      }
+
+      <!-- AI response -->
+      @if (msg.sender === 'ai bot') {
+        <div class="ai-response">
+           <!-- <p *ngIf="isGenerating && msg.content.length > 0" class="status-text generating streaming">Streaming response...</p> -->
+          <div class="response-content" [innerHTML]="formatAndSanitize(msg.content)"></div>
+           <!-- <p *ngIf="!isGenerating && msg.content.length > 0" class="status-text complete">Response complete.</p> -->
+        </div>
+      }
     }
   </div>
 </div>
-
