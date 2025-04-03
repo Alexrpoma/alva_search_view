@@ -20,7 +20,7 @@ export class AlvaSearchService implements OnDestroy {
   public isConnected$ = this.connectionStatusSubject.asObservable();
 
   constructor(private http: HttpClient) { // Inject HttpClient
-    this.clientId = crypto.randomUUID();
+    this.clientId = this.generateClientId();
     this.connectWebSocket();
   }
 
@@ -84,4 +84,22 @@ export class AlvaSearchService implements OnDestroy {
           console.log("WebSocket is already connecting or open.");
       }
   }
+
+  private generateClientId(): string {
+    if (typeof self !== 'undefined' && self.crypto && typeof self.crypto.randomUUID === 'function') {
+      try {
+         const uuid = self.crypto.randomUUID();
+         console.log("Using crypto.randomUUID() for Client ID.");
+         return uuid;
+      } catch (e) {
+         console.warn("crypto.randomUUID() failed, likely due to insecure context (HTTP). Using fallback.", e);
+      }
+    }
+    console.warn("Using simple fallback UUID generator.");
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+    });
+  }
+
 }
