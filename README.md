@@ -1,59 +1,90 @@
-# AlvaSearchView
+# ALVA SEARCH
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.5.
+Alva Search is a modern web-based search engine built with Angular that allows users to search for information on the internet. The application features a clean, user-friendly interface and is designed to provide efficient search results.
 
-## Development server
+## Features
 
-To start a local development server, run:
+- Modern, responsive user interface
+- Fast and efficient search capabilities
+- Built with Angular 19
+- Docker containerization support
+- Nginx web server configuration
 
+## Prerequisites
+
+Before you begin, ensure you have the following installed:
+- Node.js (Latest LTS version recommended)
+- Angular CLI (v19.2.5 or later)
+- Docker (optional, for containerized deployment)
+
+## Installation
+
+1. Clone the repository:
 ```bash
-ng serve
+git clone [repository-url]
+cd alva-search-view
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
+2. Install dependencies:
 ```bash
-ng generate component component-name
+npm install
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## Development
+
+To start the development server:
 
 ```bash
-ng generate --help
+npm start
 ```
 
-## Building
+The application will be available at `http://localhost:4200`
 
-To build the project run:
+## Building for Production
+
+To build the application for production:
 
 ```bash
-ng build
+npm run build
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+The build artifacts will be stored in the `dist/` directory.
 
-## Running unit tests
+## Docker Deployment
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+The project includes Docker support for easy deployment:
+
+1. Build the Docker image:
+```bash
+docker build -t alva-search .
+```
+
+2. Run the container:
+```bash
+docker run -p 80:80 alva-search
+```
+
+## Testing
+
+To run the test suite:
 
 ```bash
-ng test
+npm test
 ```
 
-## Running end-to-end tests
+## Project Structure
 
-For end-to-end (e2e) testing, run:
+- `src/` - Source code directory
+- `public/` - Static assets
+- `dist/` - Production build output
+- `nginx.conf` - Nginx configuration for production deployment
+- `Dockerfile` - Docker configuration for containerization
 
-```bash
-ng e2e
-```
+## Technologies Used
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+- Angular 19
+- TypeScript
+- RxJS
+- Font Awesome
+- Nginx
+- Docker

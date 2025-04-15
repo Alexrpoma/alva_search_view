@@ -20,9 +20,11 @@ export class SearchComponent implements OnInit, OnDestroy {
   isConnected: boolean = false;
   private resultsSubscription: Subscription | null = null;
   private connectionSubscription: Subscription | null = null;
+  private subscriptions = new Subscription();
 
   constructor(private alvaSearchService: AlvaSearchService, private sanitizer: DomSanitizer) { }
 
+  // **INITIALIZE COMPONENT:**
   ngOnInit() {
     // Subscribe to LLM results (streaming)
     this.resultsSubscription = this.alvaSearchService.getQueryResults().subscribe({
@@ -39,12 +41,11 @@ export class SearchComponent implements OnInit, OnDestroy {
                  return;
             }
 
-            if (token === '[DONE]') {
+            if (token === '[DONE]' || token.startsWith('ERROR:')) {
                 console.log("Stream finished.");
                 this.isGenerating = false;
                 return;
             }
-
 
             // Add/update AI messages
             if (this.messages.length > 0 && this.messages[this.messages.length - 1].sender === 'ai bot') {
@@ -68,6 +69,7 @@ export class SearchComponent implements OnInit, OnDestroy {
             this.isGenerating = false;
         }
    });
+   this.subscriptions.add(this.resultsSubscription);
 
     // Subscribe to WebSocket connection status
     this.connectionSubscription = this.alvaSearchService.isConnected$.subscribe(status => {
@@ -79,13 +81,14 @@ export class SearchComponent implements OnInit, OnDestroy {
           console.log("WebSocket connection status: Connected");
       }
     });
+    this.subscriptions.add(this.connectionSubscription);
   }
 
   ngOnDestroy(): void {
-    this.resultsSubscription?.unsubscribe();
-    this.connectionSubscription?.unsubscribe();
+    this.subscriptions.unsubscribe();
   }
 
+  // **FORMAT AND SANITIZE CONTENT:**
   formatAndSanitize(rawContent: string): SafeHtml {
     // 1. Replace **text** to <b>text</b> (o <strong>)
     let formattedContent = rawContent.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
@@ -99,20 +102,7 @@ export class SearchComponent implements OnInit, OnDestroy {
       this.messages.push({ sender: 'user', content: message, timestamp: new Date().toISOString() });
       this.isGenerating = true;
 
-      this.alvaSearchService.initiateQuery(message).subscribe({
-        next: (response) => {
-          console.log('HTTP request to Service A successful:', response);
-        },
-        error: (error) => {
-          console.error('HTTP request to Service A failed:', error);
-          this.messages.push({
-              sender: 'ai bot',
-              content: `Error initiating search: ${error.message || 'Could not reach service.'}`,
-              timestamp: new Date().toISOString()
-          });
-          this.isGenerating = false;
-        }
-      });
+      this.alvaSearchService.sendQueryViaWebSocket(message);
 
       this.query.reset();
     } else if (!this.isConnected) {
@@ -120,6 +110,7 @@ export class SearchComponent implements OnInit, OnDestroy {
     }
   }
 
+  // **CHECK IF THERE IS NO AI BOT MESSAGE:**
   hasNoAiBotMessage(): boolean {
     return !this.messages.find(m => m.sender === 'ai bot');
   }

@@ -14,23 +14,36 @@ export class AlvaSearchService implements OnDestroy {
   private messageSubject = new Subject<string>();
   private connectionStatusSubject = new BehaviorSubject<boolean>(false);
 
-  private readonly CONTEXT_SERVER_WS_URL = environment.contextServerWsUrl;
-  private readonly QDRANT_SERVICE_HTTP_URL = environment.qdrantServiceHttpUrl;
+  private reconnectInterval: number = 5000; // 5 seconds
+  private reconnectAttempts: number = 5;
+  private connectionSubscription: any;
+
+  private readonly AI_SERVER_WS_URL = environment.aiServerWsUrl;
+  private readonly COLLECTION_NAME = environment.collectionName;
 
   public isConnected$ = this.connectionStatusSubject.asObservable();
 
-  constructor(private http: HttpClient) { // Inject HttpClient
+  constructor() {
     this.clientId = this.generateClientId();
     this.connectWebSocket();
   }
 
   ngOnDestroy(): void {
-    this.websocket?.close();
+    clearTimeout(this.connectionSubscription); // Clear reconnection timeout
+    this.websocket?.close(1000, "Component destroyed"); // Normal closure
+    this.connectionStatusSubject.complete();
+    this.messageSubject.complete();
   }
 
-  // **CONTEXT SERVER:**
+  // **AI SERVER:**
   private connectWebSocket(): void {
-    const wsUrl = `${this.CONTEXT_SERVER_WS_URL}${this.clientId}`;
+
+    if (this.websocket && this.websocket.readyState !== WebSocket.CLOSED) {
+        console.warn("WebSocket connection attempt while already open or connecting.");
+        return;
+    }
+
+    const wsUrl = `${this.AI_SERVER_WS_URL}${this.clientId}`;
     console.log(`Connecting to WebSocket: ${wsUrl}`);
     this.websocket = new WebSocket(wsUrl);
 
@@ -52,24 +65,33 @@ export class AlvaSearchService implements OnDestroy {
       console.log('WebSocket connection closed:', event.reason || 'No reason provided', `Code: ${event.code}`);
       this.connectionStatusSubject.next(false);
       this.websocket = null;
+      // Reconnect
+      console.log(`Attempting reconnect in ${this.reconnectInterval / 1000}s...`);
+      this.connectionSubscription = setTimeout(() => this.connectWebSocket(), this.reconnectInterval);
     };
   }
 
-  // **QDRANT SERVICE:**
-  initiateQuery(query: string): Observable<any> {
-    if (!this.connectionStatusSubject.value) {
-        console.error("Cannot initiate query: WebSocket is not connected.");
-        return new Observable(observer => observer.error("WebSocket not connected"));
+  // **SEND QUERY VIA WEBSOCKET:**
+  sendQueryViaWebSocket(query: string): void {
+    if (!this.websocket || this.websocket.readyState !== WebSocket.OPEN) {
+        console.error("Cannot send query: WebSocket is not open.");
+        this.messageSubject.next("ERROR: Connection lost. Please wait or refresh.");
+        return;
     }
 
-    const payload = {
-      collection_name: environment.collectionName,
+    const message = {
+      type: "search", // Expected by the backend
       query: query,
-      client_id: this.clientId
+      collection_name: this.COLLECTION_NAME
     };
 
-    console.log(`Sending query to qdrant_service (${this.QDRANT_SERVICE_HTTP_URL}):`, payload);
-    return this.http.post<any>(this.QDRANT_SERVICE_HTTP_URL, payload);
+    console.log(`Sending query via WebSocket:`, message);
+    try {
+        this.websocket.send(JSON.stringify(message)); // Send as JSON string
+    } catch (e) {
+        console.error("Failed to send message via WebSocket:", e);
+        this.messageSubject.next("ERROR: Failed to send query. Connection may be closed.");
+    }
   }
 
   getQueryResults(): Observable<string> {
@@ -85,6 +107,7 @@ export class AlvaSearchService implements OnDestroy {
       }
   }
 
+  // **GENERATE CLIENT ID:**
   private generateClientId(): string {
     if (typeof self !== 'undefined' && self.crypto && typeof self.crypto.randomUUID === 'function') {
       try {
