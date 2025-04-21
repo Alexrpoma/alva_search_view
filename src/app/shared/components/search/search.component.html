@@ -25,30 +25,23 @@
       @for(msg of messages; track msg.timestamp) {
         @if (msg.sender === 'user') {
           <div class="user-query">
-            <!-- <h2>Your Query:</h2> -->
-            <h2>{{ msg.content }}</h2>
+            <h1><i class="bi bi-robot"></i> {{ msg.content }}</h1>
           </div>
         }
-  
+
         <!-- AI response -->
         @if (msg.sender === 'ai bot') {
-          <div class="ai-response">
-             <!-- <p *ngIf="isGenerating && msg.content.length > 0" class="status-text generating streaming">Streaming response...</p> -->
-            <div class="response-content" [innerHTML]="formatAndSanitize(msg.content | linkIcon)"></div>
-             <!-- <p *ngIf="!isGenerating && msg.content.length > 0" class="status-text complete">Response complete.</p> -->
+          <div class="container">
+            <div class="row">
+              <div class="col">
+                <!-- <p *ngIf="isGenerating && msg.content.length > 0" class="status-text generating streaming">Streaming response...</p> -->
+                <div class="response-content" [innerHTML]="formatAndSanitize(msg.content | linkIcon)"></div>
+                <!-- <p *ngIf="!isGenerating && msg.content.length > 0" class="status-text complete">Response complete.</p> -->
+              </div>
+            </div>
           </div>
         }
       }
     </div>
-  </div>
-</div>
-
-<div id="ai_search">
-
-  <!-- <p *ngIf="isGenerating && hasNoAiBotMessage()" class="status-text generating">Generating response...</p> -->
-
-
-  <div id="results-area" *ngIf="messages.length > 0">
-    
   </div>
 </div>
