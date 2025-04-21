@@ -1,10 +1,8 @@
 @import "bootstrap-icons/font/bootstrap-icons.css";
-/* @import "tailwindcss/base";
-@import "tailwindcss/components";
-@import "tailwindcss/utilities"; */
-/* @tailwind base;
-@tailwind components; */
+@tailwind base;
+@tailwind components;
 @tailwind utilities;
+
 :root {
   color-scheme: light dark;
   /* Light theme (default) */
