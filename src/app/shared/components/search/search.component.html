@@ -1,0 +1,54 @@
+<div class="container">
+  <div class="row">
+    <div class="col text-center">
+      <h1 class="text-3xl font-bold">Alva Search</h1>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col">
+      <div class="search-container">
+        <input id="question_input" class="search-input" [formControl]="query" type="text" (keyup.enter)="sendQuery()"
+          placeholder="Ask anything..." />
+        <button class="search-icon-button" (click)="sendQuery()" title="Search" aria-label="Search"
+          [disabled]="!isConnected || isGenerating">
+          <i class="fas fa-search"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+  <!-- <p>{{messages | json}}</p> -->
+  <div class="row">
+    <div class="col" *ngIf="!isConnected">
+      <p class="status-text connecting">Connecting...</p>
+    </div>
+    <div class="col" *ngIf="messages.length > 0">
+      @for(msg of messages; track msg.timestamp) {
+        @if (msg.sender === 'user') {
+          <div class="user-query">
+            <!-- <h2>Your Query:</h2> -->
+            <h2>{{ msg.content }}</h2>
+          </div>
+        }
+  
+        <!-- AI response -->
+        @if (msg.sender === 'ai bot') {
+          <div class="ai-response">
+             <!-- <p *ngIf="isGenerating && msg.content.length > 0" class="status-text generating streaming">Streaming response...</p> -->
+            <div class="response-content" [innerHTML]="formatAndSanitize(msg.content | linkIcon)"></div>
+             <!-- <p *ngIf="!isGenerating && msg.content.length > 0" class="status-text complete">Response complete.</p> -->
+          </div>
+        }
+      }
+    </div>
+  </div>
+</div>
+
+<div id="ai_search">
+
+  <!-- <p *ngIf="isGenerating && hasNoAiBotMessage()" class="status-text generating">Generating response...</p> -->
+
+
+  <div id="results-area" *ngIf="messages.length > 0">
+    
+  </div>
+</div>

@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 //import { RouterOutlet } from '@angular/router';
-import { SearchComponent } from './components/search/search.component';
+import { SearchComponent } from './shared/components/search/search.component';
 
 @Component({
   selector: 'app-root',

@@ -1,17 +1,18 @@
 import { Component, OnInit, OnDestroy} from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { AlvaSearchService } from '../../services/alva_search.service';
-import { Message } from '../../models/alva_search.model';
+import { AlvaSearchService } from '../../../services/alva_search.service';
+import { Message } from '../../../models/alva_search.model';
 import { Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
 
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { LinkIconPipe } from "../../../pipes/link-icon.pipe";
 
 @Component({
   selector: 'app-search',
-  imports: [ReactiveFormsModule, CommonModule],
+  imports: [ReactiveFormsModule, CommonModule, LinkIconPipe],
   templateUrl: './search.component.html',
-  styleUrl: './search.component.css'
+  styleUrl: './search.component.scss'
 })
 export class SearchComponent implements OnInit, OnDestroy {
   query = new FormControl('');
@@ -31,45 +32,45 @@ export class SearchComponent implements OnInit, OnDestroy {
         next: (token: string) => {
             this.isGenerating = true;
             if (token.startsWith('ERROR:')) {
-                 console.error("Received error from stream:", token);
-                 this.messages.push({
+                console.error("Received error from stream:", token);
+                this.messages.push({
                   sender: 'ai bot',
                   content: `[System Error: ${token}]`,
                   timestamp: new Date().toISOString()
-              });
-                 this.isGenerating = false; // Stop generating on error
-                 return;
+                });
+                this.isGenerating = false; // Stop generating on error
+                return;
             }
 
             if (token === '[DONE]' || token.startsWith('ERROR:')) {
-                console.log("Stream finished.");
-                this.isGenerating = false;
-                return;
+              console.log("Stream finished.");
+              this.isGenerating = false;
+              return;
             }
 
             // Add/update AI messages
             if (this.messages.length > 0 && this.messages[this.messages.length - 1].sender === 'ai bot') {
-                // Add token to the last AI message
-                this.messages[this.messages.length - 1].content += token;
+              // Add token to the last AI message
+              this.messages[this.messages.length - 1].content += token;
             } else {
-                // Create new message if no previous AI message
-                this.messages.push({
+              // Create new message if no previous AI message
+              this.messages.push({
                 sender: 'ai bot',
                 content: token, // Start with the first token
                 timestamp: new Date().toISOString()
-                });
+              });
             }
         },
         error: (err) => {
-             console.error("Error in results subscription:", err);
-             this.isGenerating = false;
+          console.error("Error in results subscription:", err);
+          this.isGenerating = false;
         },
         complete: () => {
-            console.log("Results stream completed (unexpected for Subject).");
-            this.isGenerating = false;
+          console.log("Results stream completed (unexpected for Subject).");
+          this.isGenerating = false;
         }
-   });
-   this.subscriptions.add(this.resultsSubscription);
+    });
+    this.subscriptions.add(this.resultsSubscription);
 
     // Subscribe to WebSocket connection status
     this.connectionSubscription = this.alvaSearchService.isConnected$.subscribe(status => {
@@ -90,8 +91,10 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   // **FORMAT AND SANITIZE CONTENT:**
   formatAndSanitize(rawContent: string): SafeHtml {
+    console.log(rawContent);
     // 1. Replace **text** to <b>text</b> (o <strong>)
     let formattedContent = rawContent.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+    console.log(formattedContent);
     return this.sanitizer.bypassSecurityTrustHtml(formattedContent);
   }
 
