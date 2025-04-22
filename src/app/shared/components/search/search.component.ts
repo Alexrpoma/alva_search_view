@@ -92,10 +92,10 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   // **FORMAT AND SANITIZE CONTENT:**
   formatAndSanitize(rawContent: string): SafeHtml {
-    console.log(rawContent);
+    // console.log(rawContent);
     // 1. Replace **text** to <b>text</b> (o <strong>)
     let formattedContent = rawContent.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
-    console.log(formattedContent);
+    // console.log(formattedContent);
     return this.sanitizer.bypassSecurityTrustHtml(formattedContent);
   }
 
