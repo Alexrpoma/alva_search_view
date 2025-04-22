@@ -14,7 +14,7 @@ export class LinkIconPipe implements PipeTransform {
 
     // Reemplazar cada URL por un ícono con link
     return value.replace(urlRegex, (url) => {
-      return `<a href="${url}" target="_blank" class="btn btn-sm rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="${url}" style="text-decoration:none;white-space: normal; background: #d3e3fd;">
+      return `<a href="${url}" target="_blank" class="btn btn-sm rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="${url}" style="text-decoration:none;white-space: normal; background: #d3e3fd !important;">
                 <i class="bi bi-link-45deg"></i>
               </a>`;
     });

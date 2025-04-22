@@ -45,17 +45,17 @@
     <div class="mt-5 col-xs-3 col-sm-3 d-none d-sm-block" *ngIf="messages.length > 0">
       @for(msg of messages; track msg.timestamp) {
         @if (msg.sender === 'ai bot') {
-          <div class="mb-1 card">
+          <div class="mb-1 card dark:bg-[#18202D_!important]">
             @for (item of getTitles(msg.content); track $index; let first = $first) {
               <div class="card-header" [ngClass]="{'border-top': !first}" *ngIf="item.urls && item.urls.length >= 1">
                 {{item.title}}
               </div>
               <div class="font-bold card-body">
-                <span *ngIf="item.urls && item.urls.length === 1">{{item.urls[0] | extractDomain}} <span [innerHTML]="item.urls[0] | linkIcon"></span></span>
+                <span *ngIf="item.urls && item.urls.length === 1">{{item.urls[0] | extractDomain}} <span [innerHTML]="formatAndSanitize(item.urls[0] | linkIcon)"></span></span>
                 <span *ngIf="item.urls && item.urls.length === 0">{{item.title}}</span>
                 <dl *ngIf="item.urls && item.urls.length > 1" class="mb-0 text-center">
                   <ul class="mb-0 list-inline">
-                    <li class="list-inline-item" *ngFor="let link of item.urls"> <span>{{link | extractDomain}}</span> <span [innerHTML]="link | linkIcon"></span></li>
+                    <li class="list-inline-item" *ngFor="let link of item.urls"> <span>{{link | extractDomain}}</span> <div [innerHTML]="formatAndSanitize(link | linkIcon)"></div></li>
                   </ul>
                 </dl>
               </div>
