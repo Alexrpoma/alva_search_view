@@ -7,10 +7,11 @@ import { CommonModule } from '@angular/common';
 
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { LinkIconPipe } from "../../../pipes/link-icon.pipe";
+import { ExtractDomainPipe } from "../../../pipes/extract-domain.pipe";
 
 @Component({
   selector: 'app-search',
-  imports: [ReactiveFormsModule, CommonModule, LinkIconPipe],
+  imports: [ReactiveFormsModule, CommonModule, LinkIconPipe, ExtractDomainPipe],
   templateUrl: './search.component.html',
   styleUrl: './search.component.scss'
 })

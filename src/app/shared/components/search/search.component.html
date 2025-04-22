@@ -1,9 +1,9 @@
 <div class="container-fluid">
   <div class="mt-4 row">
-    <div class="my-auto col-2 text-end">
+    <div class="my-auto col-xs-4 col-md-2 text-end">
       <h2 class="text-3xl font-bold">Alva Search</h2>
     </div>
-    <div class="col-6">
+    <div class="col-xs-8 col-md-8">
       <div class="search-container">
         <input id="question_input" class="search-input" [formControl]="query" type="text" (keyup.enter)="sendQuery()"
           placeholder="Ask anything..." />
@@ -20,7 +20,7 @@
     <div class="col-8" *ngIf="!isConnected">
       <p class="status-text connecting">Connecting...</p>
     </div>
-    <div class="col-5" *ngIf="messages.length > 0">
+    <div class="col-xs-5 col-sm-5" *ngIf="messages.length > 0">
       @for(msg of messages; track msg.timestamp) {
         @if (msg.sender === 'user') {
           <div class="user-query">
@@ -42,24 +42,25 @@
         }
       }
     </div>
-    <div class="mt-5 col-3" *ngIf="messages.length > 0">
+    <div class="mt-5 col-xs-3 col-sm-3 d-none d-sm-block" *ngIf="messages.length > 0">
       @for(msg of messages; track msg.timestamp) {
-        <!-- AI response -->
         @if (msg.sender === 'ai bot') {
-          @for (item of getTitles(msg.content); track $index) {
-            <div class="mb-1 card">
-              <div class="font-bold card-header">
-                <a *ngIf="item.urls && item.urls.length === 1" [href]="item.urls[0]">{{item.title}}</a>
+          <div class="mb-1 card">
+            @for (item of getTitles(msg.content); track $index; let first = $first) {
+              <div class="card-header" [ngClass]="{'border-top': !first}" *ngIf="item.urls && item.urls.length >= 1">
+                {{item.title}}
+              </div>
+              <div class="font-bold card-body">
+                <span *ngIf="item.urls && item.urls.length === 1">{{item.urls[0] | extractDomain}} <span [innerHTML]="item.urls[0] | linkIcon"></span></span>
                 <span *ngIf="item.urls && item.urls.length === 0">{{item.title}}</span>
-                <dl *ngIf="item.urls && item.urls.length > 1">
-                  <dt>{{item.title}}</dt>
-                  <ul class="list-inline">
-                    * <li class="list-inline-item" *ngFor="let link of item.urls" [innerHTML]="link | linkIcon"></li>
+                <dl *ngIf="item.urls && item.urls.length > 1" class="mb-0 text-center">
+                  <ul class="mb-0 list-inline">
+                    <li class="list-inline-item" *ngFor="let link of item.urls"> <span>{{link | extractDomain}}</span> <span [innerHTML]="link | linkIcon"></span></li>
                   </ul>
                 </dl>
               </div>
-            </div>
-          }
+            }
+          </div>
         }
       }
     </div>
