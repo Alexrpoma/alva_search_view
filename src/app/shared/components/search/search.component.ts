@@ -117,4 +117,63 @@ export class SearchComponent implements OnInit, OnDestroy {
   hasNoAiBotMessage(): boolean {
     return !this.messages.find(m => m.sender === 'ai bot');
   }
+
+  getTitles(content: string): any {
+
+    // Extraer títulos
+    const titleRegex = /\*\*(.*?)\*\*/g;
+    const titles = [...content.matchAll(titleRegex)].map(match => match[1].trim());
+
+    // Dividir en bloques por título
+    const parts = content.split(/\*\*(.*?)\*\*/g).filter(part => part.trim() !== '');
+
+    // Extraer todas las URLs posibles:
+    // - URL suelta
+    // - [URL](URL)
+    const urlRegex = /(?:https?:\/\/[^\s)]+)|(?:\[(https?:\/\/[^\]]+)\]\((https?:\/\/[^\)]+)\))/g;
+    const allUrls: string[] = [];
+
+    let match;
+    while ((match = urlRegex.exec(content)) !== null) {
+      // Si es del tipo [url](url), extraemos una sola vez
+      if (match[1] && match[2]) {
+        allUrls.push(match[1]); // o match[2], son iguales en este caso
+      } else {
+        allUrls.push(match[0]);
+      }
+    }
+
+    const result = [];
+    let urlIndex = 0;
+
+    for (let i = 0; i < titles.length; i++) {
+      const title = titles[i];
+
+      // Contenido del bloque correspondiente
+      const contentBlock = parts[i * 2 + 1] || "";
+
+      // Buscar urls dentro del bloque (markdown o sueltas)
+      const blockUrls = [];
+      let blockMatch;
+      const blockRegex = /(?:https?:\/\/[^\s)]+)|(?:\[(https?:\/\/[^\]]+)\]\((https?:\/\/[^\)]+)\))/g;
+
+      while ((blockMatch = blockRegex.exec(contentBlock)) !== null) {
+        blockUrls.push(blockMatch[1] || blockMatch[0]); // preferimos el texto limpio si existe
+      }
+
+      // Si el bloque tiene URLs, las usamos; si no, usamos las siguientes del total
+      const urls = blockUrls.length > 0
+        ? blockUrls
+        : allUrls.slice(urlIndex, urlIndex + 1);
+
+      urlIndex += urls.length;
+
+      result.push({ title, urls });
+    }
+
+    console.log(result);
+
+    return result;
+  }
+
 }

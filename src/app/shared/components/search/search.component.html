@@ -1,11 +1,9 @@
-<div class="container">
-  <div class="row">
-    <div class="col text-center">
-      <h1 class="text-3xl font-bold">Alva Search</h1>
+<div class="container-fluid">
+  <div class="mt-4 row">
+    <div class="my-auto col-2 text-end">
+      <h2 class="text-3xl font-bold">Alva Search</h2>
     </div>
-  </div>
-  <div class="row">
-    <div class="col">
+    <div class="col-6">
       <div class="search-container">
         <input id="question_input" class="search-input" [formControl]="query" type="text" (keyup.enter)="sendQuery()"
           placeholder="Ask anything..." />
@@ -15,13 +13,14 @@
         </button>
       </div>
     </div>
+    <div class="col-2"></div>
   </div>
   <!-- <p>{{messages | json}}</p> -->
-  <div class="row">
-    <div class="col" *ngIf="!isConnected">
+  <div class="row justify-content-end">
+    <div class="col-8" *ngIf="!isConnected">
       <p class="status-text connecting">Connecting...</p>
     </div>
-    <div class="col" *ngIf="messages.length > 0">
+    <div class="col-5" *ngIf="messages.length > 0">
       @for(msg of messages; track msg.timestamp) {
         @if (msg.sender === 'user') {
           <div class="user-query">
@@ -31,7 +30,7 @@
 
         <!-- AI response -->
         @if (msg.sender === 'ai bot') {
-          <div class="container">
+          <div class="px-0 container-fluid">
             <div class="row">
               <div class="col">
                 <!-- <p *ngIf="isGenerating && msg.content.length > 0" class="status-text generating streaming">Streaming response...</p> -->
@@ -43,5 +42,27 @@
         }
       }
     </div>
+    <div class="mt-5 col-3" *ngIf="messages.length > 0">
+      @for(msg of messages; track msg.timestamp) {
+        <!-- AI response -->
+        @if (msg.sender === 'ai bot') {
+          @for (item of getTitles(msg.content); track $index) {
+            <div class="mb-1 card">
+              <div class="font-bold card-header">
+                <a *ngIf="item.urls && item.urls.length === 1" [href]="item.urls[0]">{{item.title}}</a>
+                <span *ngIf="item.urls && item.urls.length === 0">{{item.title}}</span>
+                <dl *ngIf="item.urls && item.urls.length > 1">
+                  <dt>{{item.title}}</dt>
+                  <ul class="list-inline">
+                    * <li class="list-inline-item" *ngFor="let link of item.urls" [innerHTML]="link | linkIcon"></li>
+                  </ul>
+                </dl>
+              </div>
+            </div>
+          }
+        }
+      }
+    </div>
+    <div class="col-2"></div>
   </div>
 </div>
