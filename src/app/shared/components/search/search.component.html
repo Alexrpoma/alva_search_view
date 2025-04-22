@@ -32,9 +32,17 @@
         @if (msg.sender === 'ai bot') {
           <div class="px-0 container-fluid">
             <div class="row">
-              <div class="col">
+              <div class="mb-3 col-12" *ngFor="let content of parseNewsContent(msg.content)">
+                <span>
+                  <p class="mb-2 fs-3">{{content.title}}</p>
+                  <p class="fs-5">{{content.content}}
+                    <span class="fs-6" *ngIf="content.urls.length">
+                      <span *ngFor="let url of content.urls" [innerHTML]="formatAndSanitize( url | linkIcon)"></span>
+                    </span>
+                  </p>
+                </span>
                 <!-- <p *ngIf="isGenerating && msg.content.length > 0" class="status-text generating streaming">Streaming response...</p> -->
-                <div class="response-content" [innerHTML]="formatAndSanitize(msg.content | linkIcon)"></div>
+                <!-- <div class="response-content" [innerHTML]="formatAndSanitize(msg.content | linkIcon)"></div> -->
                 <!-- <p *ngIf="!isGenerating && msg.content.length > 0" class="status-text complete">Response complete.</p> -->
               </div>
             </div>
@@ -46,20 +54,39 @@
       @for(msg of messages; track msg.timestamp) {
         @if (msg.sender === 'ai bot') {
           <div class="mb-1 card dark:bg-[#18202D_!important]">
-            @for (item of getTitles(msg.content); track $index; let first = $first) {
-              <div class="card-header font openSans-semibold" [ngClass]="{'border-top': !first}" *ngIf="item.urls && item.urls.length >= 1">
+            <!-- @for (item of getTitles(msg.content); track $index; let first = $first) {
+              <div class="card-body font openSans-semibold" [ngClass]="{'border-top': !first}" *ngIf="item.urls && item.urls.length >= 1">
                 {{item.title}}
               </div>
               <div class="card-body font openSans-italic">
-                <span *ngIf="item.urls && item.urls.length === 1">{{item.urls[0] | extractDomain}} <span [innerHTML]="formatAndSanitize(item.urls[0] | linkIcon)"></span></span>
-                <span *ngIf="item.urls && item.urls.length === 0">{{item.title}}</span>
+                <figcaption class="blockquote-footer" *ngIf="item.urls && item.urls.length === 1">
+                  <a target="_blank" [href]="item.urls[0]">{{item.urls[0] | extractDomain}}</a>
+                </figcaption>
                 <dl *ngIf="item.urls && item.urls.length > 1" class="mb-0 text-center">
                   <ul class="mb-0 list-inline">
-                    <li class="list-inline-item" *ngFor="let link of item.urls"> <span>{{link | extractDomain}}</span> <div [innerHTML]="formatAndSanitize(link | linkIcon)"></div></li>
+                    <li class="list-inline-item" *ngFor="let link of item.urls"> <a [href]="link" target="_blank">{{link | extractDomain}}</a></li>
                   </ul>
                 </dl>
               </div>
-            }
+            } -->
+            <span *ngFor="let x of parseNewsContent(msg.content); let first = first">
+              <!-- @for (x of parseNewsContent(msg.content); track $index; let first = $first) { -->
+              <div class="card-body font openSans-semibold" [ngClass]="{'border-top': !first}">
+                {{x.title}}
+                <p class="font openSans-light clamp-2">{{x.content}}</p>
+              </div>
+              <div class="card-body font openSans-italic" *ngIf="x.urls && x.urls.length">
+                <figcaption class="blockquote-footer text-end" *ngIf="x.urls.length === 1">
+                  <a target="_blank" [href]="x.urls[0]">{{x.urls[0] | extractDomain}}</a>
+                </figcaption>
+                <dl *ngIf="x.urls.length > 1" class="mb-0 text-center">
+                  <ul class="mb-0 list-inline">
+                    <li class="list-inline-item" *ngFor="let link of x.urls"> <a [href]="link" target="_blank">{{link | extractDomain}}</a></li>
+                  </ul>
+                </dl>
+              </div>
+              <!-- } -->
+            </span>
           </div>
         }
       }

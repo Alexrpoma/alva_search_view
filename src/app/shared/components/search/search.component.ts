@@ -9,6 +9,12 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { LinkIconPipe } from "../../../pipes/link-icon.pipe";
 import { ExtractDomainPipe } from "../../../pipes/extract-domain.pipe";
 
+interface NewsBlock {
+  title: string;
+  content: string;
+  urls: string[];
+}
+
 @Component({
   selector: 'app-search',
   imports: [ReactiveFormsModule, CommonModule, LinkIconPipe, ExtractDomainPipe],
@@ -23,6 +29,8 @@ export class SearchComponent implements OnInit, OnDestroy {
   private resultsSubscription: Subscription | null = null;
   private connectionSubscription: Subscription | null = null;
   private subscriptions = new Subscription();
+
+  estaExpandido = false;
 
   constructor(private alvaSearchService: AlvaSearchService, private sanitizer: DomSanitizer) { }
 
@@ -172,9 +180,43 @@ export class SearchComponent implements OnInit, OnDestroy {
       result.push({ title, urls });
     }
 
-    console.log(result);
 
     return result;
+  }
+
+  parseNewsContent(content: any): NewsBlock[] {
+    const blocks: NewsBlock[] = [];
+
+    // Extrae todos los títulos con sus contenidos (hasta el siguiente ** o el final)
+    const newsRegex = /\*\*(.+?)\*\*\n\n([\s\S]*?)(?=\n\n\*\*|$)/g;
+    let match;
+  
+    while ((match = newsRegex.exec(content)) !== null) {
+      const title = match[1].trim();
+      let body = match[2].trim();
+  
+      // Extrae todas las URLs del bloque de contenido
+      const urlRegex = /(https?:\/\/[^\s\)\]]+)/g;
+      const urls: string[] = [];
+  
+      let urlMatch;
+      while ((urlMatch = urlRegex.exec(body)) !== null) {
+        urls.push(urlMatch[1]);
+      }
+  
+      // Elimina las URLs del contenido limpio
+      const cleanedContent = body.replace(urlRegex, '').replace(/\*\*URL:\*\*/g, '').trim();
+  
+      blocks.push({
+        title,
+        content: cleanedContent,
+        urls
+      });
+    }
+    console.log(blocks);
+    
+  
+    return blocks;
   }
 
 }
