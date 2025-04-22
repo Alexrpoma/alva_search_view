@@ -1,6 +1,6 @@
 <div class="container-fluid">
   <div class="mt-4 row">
-    <div class="my-auto col-xs-4 col-md-2 text-end">
+    <div class="my-auto mb-3 text-center col-xs-4 col-md-2 text-lg-end text-xl-end">
       <span class="text-3xl font openSans-semibold">Alva Search</span>
     </div>
     <div class="col-xs-6 col-md-6">
@@ -34,8 +34,8 @@
             <div class="row">
               <div class="mb-3 col-12" *ngFor="let content of parseNewsContent(msg.content)">
                 <span>
-                  <p class="mb-2 fs-3">{{content.title}}</p>
-                  <p class="fs-5">{{content.content}}
+                  <p class="mb-2 fs-4">{{content.title}}</p>
+                  <p class="fs-6">{{content.content}}
                     <span class="fs-6" *ngIf="content.urls.length">
                       <span *ngFor="let url of content.urls" [innerHTML]="formatAndSanitize( url | linkIcon)"></span>
                     </span>

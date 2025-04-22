@@ -213,8 +213,6 @@ export class SearchComponent implements OnInit, OnDestroy {
         urls
       });
     }
-    console.log(blocks);
-    
   
     return blocks;
   }
